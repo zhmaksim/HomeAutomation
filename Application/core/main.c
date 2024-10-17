@@ -19,10 +19,15 @@
 
 #include "main.h"
 #include "systick.h"
+#include "pwr.h"
 
 /* Private macros ---------------------------------------------------------- */
 
 /* Private constants ------------------------------------------------------- */
+
+#define VTOR_ADDRESS    0x08000000
+
+#define HSI_CLOCK       16000000
 
 /* Private types ----------------------------------------------------------- */
 
@@ -64,11 +69,12 @@ void error(void)
 {
     __disable_irq();
 
-    while (true) {}
+    while (true)
+        continue;
 }
 /* ------------------------------------------------------------------------- */
 
-static void app_main(void * arg)
+static void app_main(void *arg)
 {
     static const TickType_t frequency = pdMS_TO_TICKS(1000);
 
@@ -100,7 +106,8 @@ static void setup_hardware(void)
     setup_vector_table();
     setup_fpu();
 
-    systick_init(16000000);
+    systick_init(HSI_CLOCK);
+    pwr_init();
 }
 /* ------------------------------------------------------------------------- */
 
@@ -109,7 +116,7 @@ static void setup_vector_table(void)
     __disable_irq();
     __set_PRIMASK(1);
 
-    WRITE_REG(SCB->VTOR, 0x08000000);
+    WRITE_REG(SCB->VTOR, VTOR_ADDRESS);
 
     __set_PRIMASK(0);
     __enable_irq();
