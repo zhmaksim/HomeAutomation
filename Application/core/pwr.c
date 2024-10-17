@@ -63,3 +63,14 @@ void pwr_init(void)
     SET_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
 }
 /* ------------------------------------------------------------------------- */
+
+/**
+ * @brief           Проверить готовность VOS
+ *
+ * @return          Если TRUE - VOS в рабочем состоянии
+ */
+bool pwr_vos_is_ready(void)
+{
+    return READ_BIT(PWR->CSR, PWR_CSR_VOSRDY_Msk) ? true : false;
+}
+/* ------------------------------------------------------------------------- */

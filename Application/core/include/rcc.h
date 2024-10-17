@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef PWR_H_
-#define PWR_H_
+#ifndef RCC_H_
+#define RCC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,15 +30,18 @@ extern "C" {
 
 /* Exported constants ------------------------------------------------------ */
 
+#define CPU_CLOCK       168000000
+#define AHB_CLOCK       (CPU_CLOCK / 1)
+#define APB1_CLOCK      (AHB_CLOCK / 4)
+#define APB2_CLOCK      (AHB_CLOCK / 2)
+
 /* Exported types ---------------------------------------------------------- */
 
 /* Exported variables ------------------------------------------------------ */
 
 /* Exported function prototypes -------------------------------------------- */
 
-void pwr_init(void);
-
-bool pwr_vos_is_ready(void);
+void rcc_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -46,4 +49,4 @@ bool pwr_vos_is_ready(void);
 }
 #endif /* __cplusplus */
 
-#endif /* PWR_H_ */
+#endif /* RCC_H_ */
