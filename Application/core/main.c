@@ -15,6 +15,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/*
+ * TODO RTC
+ * TODO WATCH
+ * TODO ADC
+ * TODO SENSORS
+ * TODO SPI
+ * TODO DIO
+ */
+
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
@@ -23,6 +32,7 @@
 #include "flash.h"
 #include "rcc.h"
 #include "gpio.h"
+#include "led.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -72,8 +82,21 @@ void error(void)
 {
     __disable_irq();
 
-    while (true)
-        continue;
+    /* Выключить все светодиоды */
+    led_off(LED_ST);
+    led_off(LED_TX);
+    led_off(LED_RX);
+
+    while (true) {
+        /* Задержка */
+        for (uint32_t i = 0; i < 5000; i++) {
+            for (uint32_t j = 0; j < 1000; j++)
+                __NOP();
+        }
+
+        /* Переключить светодиод состояния */
+        led_toggle(LED_ST);
+    }
 }
 /* ------------------------------------------------------------------------- */
 
@@ -89,6 +112,9 @@ static void app_main(void *arg)
 
     while (true) {
         vTaskDelayUntil(&last_wake_time, frequency);
+
+        /* Включить светодиод состояния */
+        led_on(LED_ST);
 
         /* Обновить информацию об используемой памяти FreeRTOS */
         free_heap_size = xPortGetFreeHeapSize();
