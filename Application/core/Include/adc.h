@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2024 zhmaksim <zhiharev.maxim.alexandrovich@yandex.ru>
+/**
+ * Copyright (C) 2024 Жихарев Максим <zhiharev.maxim.alexandrovich@yandex.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_H_
-#define GPIO_H_
+#ifndef ADC_H_
+#define ADC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,19 +25,31 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_adc.h"
 
 /* Exported macros --------------------------------------------------------- */
 
 /* Exported constants ------------------------------------------------------ */
 
+#define ADC_EV_MEASURE_CPLT_Pos     (0U)
+#define ADC_EV_MEASURE_CPLT_Msk     HAL_BITMASK(0x01, ADC_EV_MEASURE_CPLT_Pos)
+#define ADC_EV_MEASURE_CPLT         ADC_EV_MEASURE_CPLT_Msk
+
+#define ADC_EV_ERR_Pos              (7U)
+#define ADC_EV_ERR_Msk              HAL_BITMASK(0x01, ADC_EV_ERR_Pos)
+#define ADC_EV_ERR                  ADC_EV_ERR_Msk
+
 /* Exported types ---------------------------------------------------------- */
 
 /* Exported variables ------------------------------------------------------ */
 
+extern struct adc_handle adc1;
+extern SemaphoreHandle_t adc1_mutex;
+extern EventGroupHandle_t adc1_event;
+
 /* Exported function prototypes -------------------------------------------- */
 
-void gpio_init(void);
+void adc_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -45,4 +57,4 @@ void gpio_init(void);
 }
 #endif /* __cplusplus */
 
-#endif /* GPIO_H_ */
+#endif /* ADC_H_ */

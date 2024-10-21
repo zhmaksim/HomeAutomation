@@ -17,7 +17,7 @@
 
 /* Includes ---------------------------------------------------------------- */
 
-#include "systick.h"
+#include "adc.h"
 #include "stm32f446xx_it.h"
 
 /* Private macros ---------------------------------------------------------- */
@@ -28,29 +28,48 @@
 
 /* Private variables ------------------------------------------------------- */
 
-/* Обработчик SysTick */
-struct systick_handle systick = {
-    .instance = SysTick,
+/* Обработчик ADC1 */
+struct adc_handle adc1 = {
+    .instance_common = ADC123_COMMON,
+    .instance = ADC1,
 };
+
+/* Mutex и Event Group ADC1 */
+SemaphoreHandle_t adc1_mutex;
+EventGroupHandle_t adc1_event_group;
 
 /* Private function prototypes --------------------------------------------- */
 
 /* Private user code ------------------------------------------------------- */
 
 /**
- * @brief           Инициализировать SysTick
- *
- * @param[in]       frequency: Частота тактирования (Гц)
+ * @brief           Инициализировать ADC
  */
-void systick_init(const uint32_t frequency)
+void adc_init(void)
 {
-    systick.init.frequency = frequency;
-    systick.init.clksource = SYSTICK_CPU_CLOCK;
+    HAL_ADC1_ENABLE_CLOCK();
 
-    hal_systick_register_callback(&systick,
-                                  SYSTICK_PERIOD_ELAPSED_CALLBACK,
-                                  SysTick_PeriodElapsedCallback);
-    hal_systick_init(&systick);
-    hal_systick_start(&systick);
+    adc1.init.div = ADC_DIV4;
+    adc1.init.resolution = ADC_12BIT;
+    adc1.init.align = ADC_RIGHT_ALIGNMENT;
+
+    hal_adc_register_callback(&adc1,
+                              ADC_MEASURE_COMPLETED_CALLBACK,
+                              ADC_MeasureCompletedCallback);
+    hal_adc_register_callback(&adc1,
+                              ADC_ERROR_CALLBACK,
+                              ADC_ErrorCallback);
+    hal_adc_init(&adc1);
+
+    NVIC_SetPriority(ADC_IRQn, 15);
+    NVIC_EnableIRQ(ADC_IRQn);
+
+    adc1_mutex = xSemaphoreCreateMutex();
+    if (adc1_mutex == NULL)
+        hal_error();
+
+    adc1_event_group = xEventGroupCreate();
+    if (adc1_event_group == NULL)
+        hal_error();
 }
 /* ------------------------------------------------------------------------- */

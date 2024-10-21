@@ -25,6 +25,9 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
+#include "stm32f4xx_hal_systick.h"
+#include "stm32f4xx_hal_pwr.h"
+#include "stm32f4xx_hal_adc.h"
 
 /* Exported macros --------------------------------------------------------- */
 
@@ -47,6 +50,18 @@ void BusFault_Handler(void);
 void UsageFault_Handler(void);
 
 void SysTick_Handler(void);
+
+void SysTick_PeriodElapsedCallback(void);
+
+void PVD_IRQHandler(void);
+
+void PWR_PVD_StatusChangedCallback(void);
+
+void ADC_IRQHandler(void);
+
+void ADC_MeasureCompletedCallback(struct adc_handle *handle);
+
+void ADC_ErrorCallback(struct adc_handle *handle);
 
 /* Exported callback function prototypes ----------------------------------- */
 

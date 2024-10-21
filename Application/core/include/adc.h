@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_H_
-#define GPIO_H_
+#ifndef ADC_H_
+#define ADC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,11 +25,19 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_adc.h"
 
 /* Exported macros --------------------------------------------------------- */
 
 /* Exported constants ------------------------------------------------------ */
+
+#define ADC_EV_MEASURE_CPLT_Pos     0
+#define ADC_EV_MEASURE_CPLT_Msk     HAL_BITMASK(0x01, ADC_EV_MEASURE_CPLT_Pos)
+#define ADC_EV_MEASURE_CPLT         ADC_EV_MEASURE_CPLT_Msk
+
+#define ADC_EV_ERR_Pos              7
+#define ADC_EV_ERR_Msk              HAL_BITMASK(0x01, ADC_EV_ERR_Pos)
+#define ADC_EV_ERR                  ADC_EV_ERR_Msk
 
 /* Exported types ---------------------------------------------------------- */
 
@@ -37,7 +45,7 @@ extern "C" {
 
 /* Exported function prototypes -------------------------------------------- */
 
-void gpio_init(void);
+void adc_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -45,4 +53,4 @@ void gpio_init(void);
 }
 #endif /* __cplusplus */
 
-#endif /* GPIO_H_ */
+#endif /* ADC_H_ */

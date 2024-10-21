@@ -24,14 +24,12 @@ extern "C" {
 
 /* Includes ---------------------------------------------------------------- */
 
-#include <stddef.h>
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <assert.h>
-#include "stm32f4xx.h"
+#include "stm32f4xx_hal_def.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
 
 /* Exported macros --------------------------------------------------------- */
 

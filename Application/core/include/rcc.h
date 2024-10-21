@@ -25,15 +25,11 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
+#include "stm32f4xx_hal_rcc.h"
 
 /* Exported macros --------------------------------------------------------- */
 
 /* Exported constants ------------------------------------------------------ */
-
-#define CPU_CLOCK       168000000
-#define AHB_CLOCK       (CPU_CLOCK / 1)
-#define APB1_CLOCK      (AHB_CLOCK / 4)
-#define APB2_CLOCK      (AHB_CLOCK / 2)
 
 /* Exported types ---------------------------------------------------------- */
 

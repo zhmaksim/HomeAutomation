@@ -15,34 +15,74 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_H_
-#define GPIO_H_
+#ifndef STM32F4XX_HAL_DEF_H_
+#define STM32F4XX_HAL_DEF_H_
 
 #ifdef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
+#endif  /* __cplusplus */
 
 /* Includes ---------------------------------------------------------------- */
 
-#include "main.h"
-#include "stm32f4xx_hal_gpio.h"
+#include <stddef.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <string.h>
+#include <assert.h>
+#include "stm32f4xx.h"
 
 /* Exported macros --------------------------------------------------------- */
 
+/**
+ * @brief           Битовая маска
+ *
+ * @param[in]       x: Значение
+ * @param[in]       n: Положение
+ * @return          Значение битовой маски
+ */
+#define HAL_BITMASK(x, n)       ((x) << (n))
+
 /* Exported constants ------------------------------------------------------ */
 
+/**
+ * @brief           Максимальное значение задержки
+ */
+#define HAL_MAX_DELAY       0xFFFFFFFF
+
 /* Exported types ---------------------------------------------------------- */
+
+/**
+ * @brief           Определение типа данных статусов
+ */
+typedef enum hal_status {
+    HAL_ERROR = 0,
+    HAL_OK,
+    /* --- */
+    HAL_RESET = 0,
+    HAL_SET,
+} hal_status_t;
+
+
+/**
+ * @brief           Определение типа данных состояний
+ */
+typedef enum hal_state {
+    HAL_DISABLE,
+    HAL_ENABLE,
+} hal_state_t;
 
 /* Exported variables ------------------------------------------------------ */
 
 /* Exported function prototypes -------------------------------------------- */
 
-void gpio_init(void);
+void hal_error(void);
 
 /* Exported callback function prototypes ----------------------------------- */
+
+__WEAK void hal_error_callback(void);
 
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif /* GPIO_H_ */
+#endif /* STM32F4XX_HAL_DEF_H_ */

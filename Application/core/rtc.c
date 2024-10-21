@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2024 zhmaksim <zhiharev.maxim.alexandrovich@yandex.ru>
+/**
+ * Copyright (C) 2024 Жихарев Максим <zhiharev.maxim.alexandrovich@yandex.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 
 /* Includes ---------------------------------------------------------------- */
 
-#include "systick.h"
-#include "stm32f446xx_it.h"
+#include "rtc.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -28,29 +27,35 @@
 
 /* Private variables ------------------------------------------------------- */
 
-/* Обработчик SysTick */
-struct systick_handle systick = {
-    .instance = SysTick,
+/* Обработчик RTC */
+struct rtc_handle rtc = {
+    .instance = RTC,
 };
+
+/* Mutex RTC */
+SemaphoreHandle_t rtc_mutex;
 
 /* Private function prototypes --------------------------------------------- */
 
 /* Private user code ------------------------------------------------------- */
 
 /**
- * @brief           Инициализировать SysTick
- *
- * @param[in]       frequency: Частота тактирования (Гц)
+ * @brief           Инициализировать RTC
  */
-void systick_init(const uint32_t frequency)
+void rtc_init(void)
 {
-    systick.init.frequency = frequency;
-    systick.init.clksource = SYSTICK_CPU_CLOCK;
+    rtc.init.clksource = RTC_LSE;
+    rtc.init.sync_div = 0xFF;
+    rtc.init.async_div = 0x7F;
+    rtc.init.hour_format = RTC_24HOUR_DAY;
+    rtc.init.ref_clock_detect_enable = HAL_ENABLE;
+    rtc.init.calib_output_enable = HAL_ENABLE;
+    rtc.init.calib_output_sel = RTC_CALIB_OUTPUT_1HZ;
 
-    hal_systick_register_callback(&systick,
-                                  SYSTICK_PERIOD_ELAPSED_CALLBACK,
-                                  SysTick_PeriodElapsedCallback);
-    hal_systick_init(&systick);
-    hal_systick_start(&systick);
+    hal_rtc_init(&rtc);
+
+    rtc_mutex = xSemaphoreCreateMutex();
+    if (rtc_mutex == NULL)
+        hal_error();
 }
 /* ------------------------------------------------------------------------- */

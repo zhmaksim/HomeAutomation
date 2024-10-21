@@ -27,6 +27,11 @@
 
 /* Private variables ------------------------------------------------------- */
 
+/* Обработчик FLASH */
+struct flash_handle flash = {
+    .instance = FLASH,
+};
+
 /* Private function prototypes --------------------------------------------- */
 
 /* Private user code ------------------------------------------------------- */
@@ -36,17 +41,11 @@
  */
 void flash_init(void)
 {
-    /* Настроить задержку чтения флэш-памяти = 5WS */
-    MODIFY_REG(FLASH->ACR,
-               FLASH_ACR_LATENCY_Msk,
-               0x05 << FLASH_ACR_LATENCY_Pos);
+    flash.init.latency = FLASH_LATENCY_5WS;
+    flash.init.prefetch_enable = HAL_ENABLE;
+    flash.init.icache_enable = HAL_ENABLE;
+    flash.init.dcache_enable = HAL_ENABLE;
 
-    /* Включить предварительную выборку данных */
-    SET_BIT(FLASH->ACR, FLASH_ACR_PRFTEN_Msk);
-
-    /* Включить кэш-инструкций и кэш-данных */
-    SET_BIT(FLASH->ACR,
-            FLASH_ACR_ICEN_Msk
-          | FLASH_ACR_DCEN_Msk);
+    hal_flash_init(&flash);
 }
 /* ------------------------------------------------------------------------- */

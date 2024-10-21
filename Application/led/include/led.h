@@ -31,49 +31,37 @@ extern "C" {
 
 /* Exported constants ------------------------------------------------------ */
 
-#define LED_COUNT       3
-
 /* Exported types ---------------------------------------------------------- */
-
-/**
- * @brief           Определение перечисления идентификаторов светодиодов
- */
-enum led_id {
-    LED_ST,
-    LED_TX,
-    LED_RX,
-    /* --- */
-    LED_NONE = -1,
-};
-
 
 /**
  * @brief           Определение перечисления состояний светодиода
  */
 enum led_state {
-    LED_OFF,
-    LED_ON,
+    LED_OFF = GPIO_RESET,
+    LED_ON = GPIO_SET,
 };
 
 
 /**
- * @brief           Определение структуры данных светодиода
+ * @brief           Определение структуры данных обработчика светодиода
  */
-struct led {
-    GPIO_TypeDef   *gpio;                       /*!< Указатель на стрктуру данных GPIO */
-
-    uint32_t        pin;                        /*!< Номер порта ввода-вывода GPIO */
+struct led_handle {
+    struct gpio_handle  *gpio;                  /*!< Указатель на структуру данных обработчика GPIO */
 };
 
 /* Exported variables ------------------------------------------------------ */
 
+extern struct led_handle led_st;
+extern struct led_handle led_tx;
+extern struct led_handle led_rx;
+
 /* Exported function prototypes -------------------------------------------- */
 
-void led_on(int32_t id);
+void led_on(struct led_handle *handle);
 
-void led_off(int32_t id);
+void led_off(struct led_handle *handle);
 
-void led_toggle(int32_t id);
+void led_toggle(struct led_handle *handle);
 
 /* Exported callback function prototypes ----------------------------------- */
 

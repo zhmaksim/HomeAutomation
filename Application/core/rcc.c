@@ -25,12 +25,14 @@
 
 /* Private constants ------------------------------------------------------- */
 
-#define RCC_HSERDY_TIMEOUT      100
-#define RCC_LSERDY_TIMEOUT      5000
-
 /* Private types ----------------------------------------------------------- */
 
 /* Private variables ------------------------------------------------------- */
+
+/* Обработчик RCC */
+struct rcc_handle rcc = {
+    .instance = RCC,
+};
 
 /* Private function prototypes --------------------------------------------- */
 
@@ -41,89 +43,30 @@
  */
 void rcc_init(void)
 {
-    uint32_t tickstart;
+    rcc.init.hse_enable = HAL_ENABLE;
+    rcc.init.css_enable = HAL_ENABLE;
+    rcc.init.lse_enable = HAL_ENABLE;
+    rcc.init.pll_init.enable = HAL_ENABLE;
+    rcc.init.pll_init.clksource = RCC_PLL_CLOCK_SOURCE_HSE;
+    rcc.init.pll_init.divm = 8;
+    rcc.init.pll_init.divn = 168;
+    rcc.init.pll_init.divp = 2;
+    rcc.init.pll_init.divq = 7;
+    rcc.init.pll_init.divr = 7;
+    rcc.init.ahb_div = RCC_AHB_NOT_DIV;
+    rcc.init.apb1_div = RCC_APB_DIV4;
+    rcc.init.apb2_div = RCC_APB_DIV2;
+    rcc.init.cpu_clksource = RCC_CPU_CLOCK_SOURCE_PLLP;
+    rcc.init.mco1_clksource = RCC_MCO1_CLOCK_SOURCE_LSE;
+    rcc.init.mco1_div = RCC_MCO1_NOT_DIV;
 
-    /* Включить HSE */
-    SET_BIT(RCC->CR, RCC_CR_HSEON_Msk);
+    rcc.ahb_clock = 168000000;
+    rcc.apb1_clock = 42000000;
+    rcc.apb2_clock = 84000000;
+    rcc.cpu_clock = 168000000;
 
-    tickstart = systick_get_tick();
+    hal_rcc_init(&rcc);
 
-    while (!READ_BIT(RCC->CR, RCC_CR_HSERDY_Msk)) {
-        if (systick_get_tick() - tickstart >= RCC_HSERDY_TIMEOUT)
-            error();
-    }
-
-    /* Включить CSS HSE */
-    SET_BIT(RCC->CR, RCC_CR_CSSON_Msk);
-
-    /* Включить LSE */
-    SET_BIT(RCC->BDCR, RCC_BDCR_LSEON_Msk);
-
-    tickstart = systick_get_tick();
-
-    while (!READ_BIT(RCC->BDCR, RCC_BDCR_LSERDY_Msk)) {
-        if (systick_get_tick() - tickstart >= RCC_LSERDY_TIMEOUT)
-            error();
-    }
-
-    /* Настроить PLL */
-    CLEAR_BIT(RCC->CR, RCC_CR_PLLON_Msk);
-
-    /* Настроить источник тактирования = HSE (16MHz) */
-    SET_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLSRC_Msk);
-
-    /* Настроить DIVM = /8 (16MHz / 8 = 2MHz) */
-    MODIFY_REG(RCC->PLLCFGR,
-               RCC_PLLCFGR_PLLM_Msk,
-               8 << RCC_PLLCFGR_PLLM_Pos);
-
-    /* Настроить DIVN = x168 (2MHz * 168 = 336MHz) */
-    MODIFY_REG(RCC->PLLCFGR,
-               RCC_PLLCFGR_PLLN_Msk,
-               168 << RCC_PLLCFGR_PLLN_Pos);
-
-    /* Настроить DIVP = /2 (336MHz / 2 = 168MHz) */
-    CLEAR_BIT(RCC->PLLCFGR, RCC_PLLCFGR_PLLP_Msk);
-
-    /* Настроить DIVQ = /7 (336MHz / 7 = 48MHz) */
-    MODIFY_REG(RCC->PLLCFGR,
-               RCC_PLLCFGR_PLLQ_Msk,
-               7 << RCC_PLLCFGR_PLLQ_Pos);
-
-    /* Настроить DIVR = /7 (336MHz / 7 = 48MHz) */
-    MODIFY_REG(RCC->PLLCFGR,
-               RCC_PLLCFGR_PLLR_Msk,
-               7 << RCC_PLLCFGR_PLLR_Pos);
-
-    /* Включить PLL */
-    SET_BIT(RCC->CR, RCC_CR_PLLON_Msk);
-    while (!READ_BIT(RCC->CR, RCC_CR_PLLRDY_Msk))
-        continue;
-
-    /* Дождаться готовности PWR VOS после включения PLL */
-    while (!pwr_vos_is_ready())
-        continue;
-
-    /* Настроить AHB = /1, APB1 = /4, APB2 = /2 */
-    MODIFY_REG(RCC->CFGR,
-               RCC_CFGR_HPRE_Msk
-             | RCC_CFGR_PPRE1_Msk
-             | RCC_CFGR_PPRE2_Msk,
-               0x05 << RCC_CFGR_PPRE1_Pos
-             | 0x04 << RCC_CFGR_PPRE2_Pos);
-
-    /* Настроить источник тактирования CPU = PLLP */
-    MODIFY_REG(RCC->CFGR,
-               RCC_CFGR_SW_Msk,
-               0x02 << RCC_CFGR_SW_Pos);
-    while (READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Msk) !=
-            0x02 << RCC_CFGR_SWS_Pos)
-        continue;
-
-    /* Настроить MCO1 = LSE */
-    MODIFY_REG(RCC->CFGR,
-               RCC_CFGR_MCO1_Msk
-             | RCC_CFGR_MCO1PRE_Msk,
-               0x01 << RCC_CFGR_MCO1_Pos);
+    HAL_RCC_ENABLE_CLOCK_BACKUP_SRAM();
 }
 /* ------------------------------------------------------------------------- */

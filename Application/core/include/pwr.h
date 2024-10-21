@@ -25,6 +25,7 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
+#include "stm32f4xx_hal_pwr.h"
 
 /* Exported macros --------------------------------------------------------- */
 
@@ -37,8 +38,6 @@ extern "C" {
 /* Exported function prototypes -------------------------------------------- */
 
 void pwr_init(void);
-
-bool pwr_vos_is_ready(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 

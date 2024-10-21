@@ -17,8 +17,7 @@
 
 /* Includes ---------------------------------------------------------------- */
 
-#include "systick.h"
-#include "stm32f446xx_it.h"
+#include "stm32f4xx_hal_def.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -28,29 +27,27 @@
 
 /* Private variables ------------------------------------------------------- */
 
-/* Обработчик SysTick */
-struct systick_handle systick = {
-    .instance = SysTick,
-};
-
 /* Private function prototypes --------------------------------------------- */
 
 /* Private user code ------------------------------------------------------- */
 
-/**
- * @brief           Инициализировать SysTick
- *
- * @param[in]       frequency: Частота тактирования (Гц)
- */
-void systick_init(const uint32_t frequency)
+void hal_error(void)
 {
-    systick.init.frequency = frequency;
-    systick.init.clksource = SYSTICK_CPU_CLOCK;
+    /* Выключить прерывания */
+    __disable_irq();
 
-    hal_systick_register_callback(&systick,
-                                  SYSTICK_PERIOD_ELAPSED_CALLBACK,
-                                  SysTick_PeriodElapsedCallback);
-    hal_systick_init(&systick);
-    hal_systick_start(&systick);
+    /*
+     * При возникновении критической ошибки
+     * переходим в бесконечный цикл и вызываем
+     * функцию обратного вызова hal_error_callback
+     */
+    while (true)
+        hal_error_callback();
+}
+/* ------------------------------------------------------------------------- */
+
+__WEAK void hal_error_callback(void)
+{
+
 }
 /* ------------------------------------------------------------------------- */

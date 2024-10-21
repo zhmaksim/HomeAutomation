@@ -19,6 +19,9 @@
 
 #include "stm32f446xx_it.h"
 #include "systick.h"
+#include "pwr.h"
+#include "adc.h"
+#include "sensors.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -28,51 +31,98 @@
 
 /* Private variables ------------------------------------------------------- */
 
+/* Обработчик SysTick */
+extern struct systick_handle systick;
+
+/* Обработчик PWR */
+extern struct pwr_handle pwr;
+
+/* Состояние VDD */
+extern bool vdd_is_lower;
+
+/* Обработчик ADC1 */
+extern struct adc_handle adc1;
+
 /* Private function prototypes --------------------------------------------- */
 
 /* Private user code ------------------------------------------------------- */
 
 void NMI_Handler(void)
 {
-    error();
+    hal_error();
 }
 /* ------------------------------------------------------------------------- */
 
 void HardFault_Handler(void)
 {
-    error();
+    hal_error();
 }
 /* ------------------------------------------------------------------------- */
 
 void MemManage_Handler(void)
 {
-    error();
+    hal_error();
 }
 /* ------------------------------------------------------------------------- */
 
 void BusFault_Handler(void)
 {
-    error();
+    hal_error();
 }
 /* ------------------------------------------------------------------------- */
 
 void UsageFault_Handler(void)
 {
-    error();
+    hal_error();
 }
 /* ------------------------------------------------------------------------- */
 
 void SysTick_Handler(void)
 {
-    systick_it_handler();
+    hal_systick_it_handler(&systick);
 }
 /* ------------------------------------------------------------------------- */
 
-void systick_period_elapsed_callback(void)
+void SysTick_PeriodElapsedCallback(void)
 {
     /* Обработать системный таймер FreeRTOS */
-    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
         xPortSysTickHandler();
+}
+/* ------------------------------------------------------------------------- */
+
+void PVD_IRQHandler(void)
+{
+    hal_pwr_pvd_it_handler(&pwr);
+}
+/* ------------------------------------------------------------------------- */
+
+void PWR_PVD_StatusChangedCallback(void)
+{
+    if (hal_pwr_pvd_status(&pwr) == PWR_VDD_LOWER_PVD) {
+        vdd_is_lower = true;
+    } else {
+        vdd_is_lower = false;
     }
+}
+/* ------------------------------------------------------------------------- */
+
+void ADC_IRQHandler(void)
+{
+    hal_adc_it_handler(&adc1);
+}
+/* ------------------------------------------------------------------------- */
+
+void ADC_MeasureCompletedCallback(struct adc_handle *handle)
+{
+    if (handle == &adc1)
+        sensors_adc_measure_completed_it_handler(&sensors);
+}
+/* ------------------------------------------------------------------------- */
+
+void ADC_ErrorCallback(struct adc_handle *handle)
+{
+    if (handle == &adc1)
+        sensors_adc_error_it_handler(&sensors);
 }
 /* ------------------------------------------------------------------------- */

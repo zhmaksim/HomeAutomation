@@ -18,6 +18,7 @@
 /* Includes ---------------------------------------------------------------- */
 
 #include "pwr.h"
+#include "stm32f446xx_it.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -26,6 +27,11 @@
 /* Private types ----------------------------------------------------------- */
 
 /* Private variables ------------------------------------------------------- */
+
+/* Обработчик PWR */
+struct pwr_handle pwr = {
+    .instance = PWR,
+};
 
 /* Private function prototypes --------------------------------------------- */
 
@@ -36,41 +42,17 @@
  */
 void pwr_init(void)
 {
-    /* Включить тактирование */
-    SET_BIT(RCC->APB1ENR, RCC_APB1ENR_PWREN_Msk);
+    HAL_PWR_ENABLE_CLOCK();
 
-    /* Отключить защиту от записи в домен резервного копирования */
-    SET_BIT(PWR->CR, PWR_CR_DBP_Msk);
+    pwr.init.vos = PWR_VOS1;
+    pwr.init.pvd_enable = HAL_ENABLE;
+    pwr.init.pvd_level = PWR_PVD_2V9;
+    pwr.init.backup_regulator_enable = HAL_ENABLE;
+    pwr.init.wkup1_enable = HAL_ENABLE;
 
-    /* Включение резервного регулятора */
-    SET_BIT(PWR->CSR, PWR_CSR_BRE_Msk);
-    while (!READ_BIT(PWR->CSR, PWR_CSR_BRE_Msk))
-        continue;
-
-    /* Настроить VOS = Scale 1 */
-    MODIFY_REG(PWR->CR,
-               PWR_CR_VOS_Msk,
-               0x03 << PWR_CR_VOS_Pos);
-
-    /* Включить и настроить PVD = 2V9 */
-    SET_BIT(PWR->CR, PWR_CR_PVDE_Msk);
-
-    MODIFY_REG(PWR->CR,
-               PWR_CR_PLS_Msk,
-               0x07 << PWR_CR_PLS_Pos);
-
-    /* Включить WKUP1 */
-    SET_BIT(PWR->CSR, PWR_CSR_EWUP1_Msk);
-}
-/* ------------------------------------------------------------------------- */
-
-/**
- * @brief           Проверить готовность VOS
- *
- * @return          Если TRUE - VOS в рабочем состоянии
- */
-bool pwr_vos_is_ready(void)
-{
-    return READ_BIT(PWR->CSR, PWR_CSR_VOSRDY_Msk) ? true : false;
+    hal_pwr_register_callback(&pwr,
+                              PWR_PVD_STATUS_CHANGED_CALLBACK,
+                              PWR_PVD_StatusChangedCallback);
+    hal_pwr_init(&pwr);
 }
 /* ------------------------------------------------------------------------- */

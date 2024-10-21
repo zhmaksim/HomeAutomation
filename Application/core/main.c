@@ -16,12 +16,17 @@
  */
 
 /*
- * TODO RTC
- * TODO WATCH
- * TODO ADC
- * TODO SENSORS
+ * TODO DMA
  * TODO SPI
  * TODO DIO
+ * TODO W25Q
+ * TODO FatFs
+ * TODO W5500
+ * TODO Http Server
+ * TODO I2C
+ * TODO EEPROM
+ * TODO USART
+ * TODO Modbus RTU
  */
 
 /* Includes ---------------------------------------------------------------- */
@@ -32,7 +37,11 @@
 #include "flash.h"
 #include "rcc.h"
 #include "gpio.h"
+#include "rtc.h"
+#include "adc.h"
 #include "led.h"
+#include "watch.h"
+#include "sensors.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -46,10 +55,16 @@
 
 /* Private variables ------------------------------------------------------- */
 
+/* Состояние VDD */
+bool vdd_is_lower;
+
 /* Параметры отслеживания работы FreeRTOS */
-static size_t free_heap_size;
-static size_t minimum_ever_free_heap_size;
-static uint32_t appl_idle_hook_counter;
+size_t free_heap_size;
+size_t minimum_ever_free_heap_size;
+uint32_t appl_idle_hook_counter;
+
+/* Обработчик RCC */
+extern struct rcc_handle rcc;
 
 /* Private function prototypes --------------------------------------------- */
 
@@ -78,14 +93,12 @@ int main(void)
 }
 /* ------------------------------------------------------------------------- */
 
-void error(void)
+void hal_error_callback(void)
 {
-    __disable_irq();
-
     /* Выключить все светодиоды */
-    led_off(LED_ST);
-    led_off(LED_TX);
-    led_off(LED_RX);
+    led_off(&led_st);
+    led_off(&led_tx);
+    led_off(&led_rx);
 
     while (true) {
         /* Задержка */
@@ -95,7 +108,7 @@ void error(void)
         }
 
         /* Переключить светодиод состояния */
-        led_toggle(LED_ST);
+        led_toggle(&led_st);
     }
 }
 /* ------------------------------------------------------------------------- */
@@ -105,7 +118,8 @@ static void app_main(void *arg)
     static const TickType_t frequency = pdMS_TO_TICKS(1000);
 
     /* INIT CODE BEGIN ----------------------------------------------------- */
-
+    watch_init(&watch);
+    sensors_init(&sensors);
     /* INIT CODE END ------------------------------------------------------- */
 
     TickType_t last_wake_time = xTaskGetTickCount();
@@ -114,7 +128,7 @@ static void app_main(void *arg)
         vTaskDelayUntil(&last_wake_time, frequency);
 
         /* Включить светодиод состояния */
-        led_on(LED_ST);
+        led_on(&led_st);
 
         /* Обновить информацию об используемой памяти FreeRTOS */
         free_heap_size = xPortGetFreeHeapSize();
@@ -139,8 +153,10 @@ static void setup_hardware(void)
     pwr_init();
     flash_init();
     rcc_init();
-    systick_init(CPU_CLOCK);
+    systick_init(rcc.cpu_clock);
     gpio_init();
+    rtc_init();
+    adc_init();
 }
 /* ------------------------------------------------------------------------- */
 

@@ -27,22 +27,24 @@
 
 /* Private variables ------------------------------------------------------- */
 
-static struct led led[LED_COUNT] = {
-    /* ST */
-    {
-        .gpio = GPIOB,
-        .pin = GPIO_ODR_OD0,
-    },
-    /* TX */
-    {
-        .gpio = GPIOB,
-        .pin = GPIO_ODR_OD4,
-    },
-    /* RX */
-    {
-        .gpio = GPIOB,
-        .pin = GPIO_ODR_OD5,
-    },
+/* Обработчики GPIO LED ST, TX, RX */
+extern struct gpio_handle gpio_led_st;
+extern struct gpio_handle gpio_led_tx;
+extern struct gpio_handle gpio_led_rx;
+
+/* Обработчик LED ST */
+struct led_handle led_st = {
+    .gpio = &gpio_led_st,
+};
+
+/* Обработчик LED TX */
+struct led_handle led_tx = {
+    .gpio = &gpio_led_tx,
+};
+
+/* Обработчик LED RX */
+struct led_handle led_rx = {
+    .gpio = &gpio_led_rx,
 };
 
 /* Private function prototypes --------------------------------------------- */
@@ -52,38 +54,38 @@ static struct led led[LED_COUNT] = {
 /**
  * @brief           Включить светодиод
  *
- * @param[in]       id: Идентификатор светодиода
+ * @param[in]       handle: Указатель на структуру данных обработчика светодиода
  */
-void led_on(int32_t id)
+void led_on(struct led_handle *handle)
 {
-    assert(id < LED_COUNT && id > LED_NONE);
+    assert(handle != NULL);
 
-    SET_BIT(led[id].gpio->BSRR, led[id].pin);
+    hal_gpio_set_state(handle->gpio, GPIO_SET);
 }
 /* ------------------------------------------------------------------------- */
 
 /**
  * @brief           Выключить светодиод
  *
- * @param[in]       id: Идентификатор светодиода
+ * @param[in]       handle: Указатель на структуру данных обработчика светодиода
  */
-void led_off(int32_t id)
+void led_off(struct led_handle *handle)
 {
-    assert(id < LED_COUNT && id > LED_NONE);
+    assert(handle != NULL);
 
-    SET_BIT(led[id].gpio->BSRR, led[id].pin << 16);
+    hal_gpio_set_state(handle->gpio, GPIO_RESET);
 }
 /* ------------------------------------------------------------------------- */
 
 /**
  * @brief           Переключить состояние светодиода
  *
- * @param[in]       id: Идентификатор светодиода
+ * @param[in]       handle: Указатель на структуру данных обработчика светодиода
  */
-void led_toggle(int32_t id)
+void led_toggle(struct led_handle *handle)
 {
-    assert(id < LED_COUNT && id > LED_NONE);
+    assert(handle != NULL);
 
-    XOR_BIT(led[id].gpio->ODR, led[id].pin);
+    hal_gpio_toggle(handle->gpio);
 }
 /* ------------------------------------------------------------------------- */

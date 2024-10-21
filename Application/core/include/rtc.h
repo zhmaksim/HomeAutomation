@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef GPIO_H_
-#define GPIO_H_
+#ifndef RTC_H_
+#define RTC_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +25,7 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "stm32f4xx_hal_gpio.h"
+#include "stm32f4xx_hal_rtc.h"
 
 /* Exported macros --------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ extern "C" {
 
 /* Exported function prototypes -------------------------------------------- */
 
-void gpio_init(void);
+void rtc_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -45,4 +45,4 @@ void gpio_init(void);
 }
 #endif /* __cplusplus */
 
-#endif /* GPIO_H_ */
+#endif /* RTC_H_ */
