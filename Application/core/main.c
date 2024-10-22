@@ -55,6 +55,29 @@
 
 /* Private variables ------------------------------------------------------- */
 
+/* Идентификатор устройства */
+const uint8_t device_id = 16;
+
+/* Статус устройства */
+enum device_status device_status = DEVICE_NOT_INIT;
+
+/* Версия ПО */
+const struct sw_version sw_version = {
+    .major = 1,
+    .minor = 0,
+    .build = 0,
+};
+
+/* Дата ПО */
+const struct sw_date sw_date = {
+    .day = 22,
+    .month = 10,
+    .year = 24,
+};
+
+/* Контрольная сумма ПО */
+const uint32_t sw_checksum = 0x4B5C24D1;
+
 /* Состояние VDD */
 bool vdd_is_lower;
 

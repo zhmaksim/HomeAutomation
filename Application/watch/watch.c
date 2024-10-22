@@ -73,7 +73,7 @@ void watch_init(struct watch_handle *handle)
  */
 static void watch_process(void *arg)
 {
-    static const TickType_t frequency = pdMS_TO_TICKS(1000);
+    static const TickType_t frequency = pdMS_TO_TICKS(500);
 
     struct watch_handle *handle = arg;
 

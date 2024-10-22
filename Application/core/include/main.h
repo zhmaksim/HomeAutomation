@@ -37,7 +37,49 @@ extern "C" {
 
 /* Exported types ---------------------------------------------------------- */
 
+/**
+ * @brief           Определение перечисления статусов устройства
+ */
+enum device_status {
+    DEVICE_NOT_INIT,
+    DEVICE_WORK = 0xFF,
+};
+
+
+/**
+ * @brief           Определение структуры данных версии ПО
+ */
+struct sw_version {
+    uint16_t    major;                          /*!< Увеличивается при критических изменениях ПО */
+
+    uint16_t    minor;                          /*!< Увеличивается при добавлении новых функций ПО */
+
+    uint16_t    build;                          /*!< Увеличивается при исправлении ошибок ПО */
+};
+
+
+/**
+ * @brief           Определение структуры данных даты ПО
+ */
+struct sw_date {
+    uint8_t     day;                            /*!< День */
+
+    uint8_t     month;                          /*!< Месяц */
+
+    uint8_t     year;                           /*!< Год */
+};
+
 /* Exported variables ------------------------------------------------------ */
+
+extern const uint8_t device_id;
+
+extern enum device_status device_status;
+
+extern const struct sw_version sw_version;
+
+extern const struct sw_date sw_date;
+
+extern const uint32_t sw_checksum;
 
 /* Exported function prototypes -------------------------------------------- */
 

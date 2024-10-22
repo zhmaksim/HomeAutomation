@@ -85,7 +85,7 @@ void sensors_init(struct sensors_handle *handle)
  */
 static void sensors_process(void *arg)
 {
-    static const TickType_t frequency = pdMS_TO_TICKS(25);
+    static const TickType_t frequency = pdMS_TO_TICKS(300);
 
     struct sensors_handle *handle = arg;
 
