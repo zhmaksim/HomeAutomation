@@ -19,7 +19,6 @@
  * TODO USART
  * TODO Modbus RTU
  * TODO W5500
- * TODO FatFs
  * TODO HTTP-server
  */
 
@@ -41,8 +40,9 @@
 #include "watch.h"
 #include "sensors.h"
 #include "dio.h"
-#include "w25q.h"
 #include "eeprom.h"
+#include "w25q.h"
+#include "storage.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -108,7 +108,7 @@ int main(void)
 
     xTaskCreate(app_main,
                 "app_main",
-                configMINIMAL_STACK_SIZE,
+                configMINIMAL_STACK_SIZE * 4,
                 NULL,
                 tskIDLE_PRIORITY + 1,
                 NULL);
@@ -142,11 +142,19 @@ static void app_main(void *arg)
     static const TickType_t frequency = pdMS_TO_TICKS(1000);
 
     /* INIT CODE BEGIN ----------------------------------------------------- */
+    /* Инициализировать часы */
     watch_init(&watch);
+    /* Инициализировать датчики */
     sensors_init(&sensors);
+    /* Инициализировать входные-выходные сигналы */
     dio_init(&dio);
-    w25q_init(&w25q);
+    /* Инициализировать EEPROM */
     eeprom_init(&eeprom);
+    /* Инициализировать W25Q */
+    w25q_init(&w25q);
+    /* Инициализировать хранилище FatFs */
+    storage_ff_init();
+    /* Загрузка EEPROM после инициализации всех компонентов */
     eeprom_load(&eeprom);
     /* INIT CODE END ------------------------------------------------------- */
 
