@@ -24,10 +24,13 @@
 #include "dma.h"
 #include "spi.h"
 #include "i2c.h"
+#include "usart.h"
+#include "tim.h"
 #include "sensors.h"
 #include "dio.h"
-#include "w25q.h"
 #include "eeprom.h"
+#include "w25q.h"
+#include "modbus.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -64,6 +67,14 @@ extern struct spi_handle spi3;
 
 /* Обработчик I2C1 */
 extern struct i2c_handle i2c1;
+
+/* Обработчики USART */
+extern struct usart_handle usart1;
+extern struct usart_handle usart2;
+extern struct usart_handle usart6;
+
+/* Обработчик TIM7 */
+extern struct tim_handle tim7;
 
 /* Private function prototypes --------------------------------------------- */
 
@@ -248,5 +259,74 @@ void I2C_ErrorCallback(struct i2c_handle *handle)
 {
     if (handle == &i2c1)
         eeprom_i2c_error_it_handler(&eeprom);
+}
+/* ------------------------------------------------------------------------- */
+
+void USART1_IRQHandler(void)
+{
+    hal_usart_it_handler(&usart1);
+}
+/* ------------------------------------------------------------------------- */
+
+void USART2_IRQHandler(void)
+{
+    hal_usart_it_handler(&usart2);
+}
+/* ------------------------------------------------------------------------- */
+
+void USART6_IRQHandler(void)
+{
+    hal_usart_it_handler(&usart6);
+}
+/* ------------------------------------------------------------------------- */
+
+void USART_TransmitCompletedCallback(struct usart_handle *handle)
+{
+    if (handle == &usart1) {
+        modbus_usart_transmit_completed_it_handler(&modbus[MODBUS0]);
+    } else if (handle == &usart2) {
+        modbus_usart_transmit_completed_it_handler(&modbus[MODBUS1]);
+    } else if (handle == &usart6) {
+
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void USART_ReceiveCompletedCallback(struct usart_handle *handle)
+{
+    if (handle == &usart1) {
+        modbus_usart_receive_completed_it_handler(&modbus[MODBUS0]);
+    } else if (handle == &usart2) {
+        modbus_usart_receive_completed_it_handler(&modbus[MODBUS1]);
+    } else if (handle == &usart6) {
+
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void USART_ErrorCallback(struct usart_handle *handle)
+{
+    if (handle == &usart1) {
+        modbus_usart_error_it_handler(&modbus[MODBUS0]);
+    } else if (handle == &usart2) {
+        modbus_usart_error_it_handler(&modbus[MODBUS1]);
+    } else if (handle == &usart6) {
+
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void TIM7_IRQHandler(void)
+{
+    hal_tim_it_handler(&tim7);
+}
+/* ------------------------------------------------------------------------- */
+
+void TIM_PeriodElapsedCallback(struct tim_handle *handle)
+{
+    if (handle == &tim7) {
+        modbus_tim_it_handler(&modbus[MODBUS0]);
+        modbus_tim_it_handler(&modbus[MODBUS1]);
+    }
 }
 /* ------------------------------------------------------------------------- */

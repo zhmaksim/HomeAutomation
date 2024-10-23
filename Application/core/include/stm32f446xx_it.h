@@ -31,6 +31,8 @@ extern "C" {
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f4xx_hal_spi.h"
 #include "stm32f4xx_hal_i2c.h"
+#include "stm32f4xx_hal_usart.h"
+#include "stm32f4xx_hal_tim.h"
 
 /* Exported macros --------------------------------------------------------- */
 
@@ -93,6 +95,22 @@ void I2C1_ER_IRQHandler(void);
 void I2C_CommandCompletedCallback(struct i2c_handle *handle);
 
 void I2C_ErrorCallback(struct i2c_handle *handle);
+
+void USART1_IRQHandler(void);
+
+void USART2_IRQHandler(void);
+
+void USART6_IRQHandler(void);
+
+void USART_TransmitCompletedCallback(struct usart_handle *handle);
+
+void USART_ReceiveCompletedCallback(struct usart_handle *handle);
+
+void USART_ErrorCallback(struct usart_handle *handle);
+
+void TIM7_IRQHandler(void);
+
+void TIM_PeriodElapsedCallback(struct tim_handle *handle);
 
 /* Exported callback function prototypes ----------------------------------- */
 

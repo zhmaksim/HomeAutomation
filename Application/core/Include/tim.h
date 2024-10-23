@@ -1,5 +1,5 @@
-/*
- * Copyright (C) 2024 zhmaksim <zhiharev.maxim.alexandrovich@yandex.ru>
+/**
+ * Copyright (C) 2024 Жихарев Максим <zhiharev.maxim.alexandrovich@yandex.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef LED_H_
-#define LED_H_
+#ifndef TIM_H_
+#define TIM_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,52 +25,23 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "gpio.h"
+#include "stm32f4xx_hal_tim.h"
 
 /* Exported macros --------------------------------------------------------- */
 
 /* Exported constants ------------------------------------------------------ */
 
-#define LED_COUNT       3
-
 /* Exported types ---------------------------------------------------------- */
-
-/**
- * @brief           Определение перечисления идентификаторов светодиодов
- */
-enum led_id {
-    LED_ST,
-    LED_TX,
-    LED_RX,
-};
-
-/**
- * @brief           Определение перечисления состояний светодиода
- */
-enum led_state {
-    LED_OFF = GPIO_RESET,
-    LED_ON = GPIO_SET,
-};
-
-
-/**
- * @brief           Определение структуры данных обработчика светодиода
- */
-struct led_handle {
-    struct gpio_handle  *gpio;                  /*!< Указатель на структуру данных обработчика GPIO */
-};
 
 /* Exported variables ------------------------------------------------------ */
 
-extern struct led_handle led[LED_COUNT];
+extern struct tim_handle tim5;
+extern struct tim_handle tim6;
+extern struct tim_handle tim7;
 
 /* Exported function prototypes -------------------------------------------- */
 
-void led_on(struct led_handle *handle);
-
-void led_off(struct led_handle *handle);
-
-void led_toggle(struct led_handle *handle);
+void tim_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -78,4 +49,4 @@ void led_toggle(struct led_handle *handle);
 }
 #endif /* __cplusplus */
 
-#endif /* LED_H_ */
+#endif /* TIM_H_ */

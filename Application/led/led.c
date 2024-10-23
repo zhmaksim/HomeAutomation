@@ -32,19 +32,17 @@ extern struct gpio_handle gpio_led_st;
 extern struct gpio_handle gpio_led_tx;
 extern struct gpio_handle gpio_led_rx;
 
-/* Обработчик LED ST */
-struct led_handle led_st = {
-    .gpio = &gpio_led_st,
-};
-
-/* Обработчик LED TX */
-struct led_handle led_tx = {
-    .gpio = &gpio_led_tx,
-};
-
-/* Обработчик LED RX */
-struct led_handle led_rx = {
-    .gpio = &gpio_led_rx,
+/* Обработчики LED */
+struct led_handle led[LED_COUNT] = {
+    {
+        .gpio = &gpio_led_st,
+    },
+    {
+        .gpio = &gpio_led_tx,
+    },
+    {
+        .gpio = &gpio_led_rx,
+    },
 };
 
 /* Private function prototypes --------------------------------------------- */

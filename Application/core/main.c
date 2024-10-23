@@ -16,10 +16,10 @@
  */
 
 /*
- * TODO USART
- * TODO Modbus RTU
+ * TODO TempHumSensors
  * TODO W5500
  * TODO HTTP-server
+ * TODO STM32-ESP32
  */
 
 /* Includes ---------------------------------------------------------------- */
@@ -32,10 +32,12 @@
 #include "gpio.h"
 #include "rtc.h"
 #include "adc.h"
+#include "crc.h"
 #include "dma.h"
 #include "spi.h"
 #include "i2c.h"
-#include "crc.h"
+#include "usart.h"
+#include "tim.h"
 #include "led.h"
 #include "watch.h"
 #include "sensors.h"
@@ -43,6 +45,7 @@
 #include "eeprom.h"
 #include "w25q.h"
 #include "storage.h"
+#include "modbus.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -120,9 +123,9 @@ int main(void)
 void hal_error_callback(void)
 {
     /* Выключить все светодиоды */
-    led_off(&led_st);
-    led_off(&led_tx);
-    led_off(&led_rx);
+    led_off(&led[LED_ST]);
+    led_off(&led[LED_TX]);
+    led_off(&led[LED_RX]);
 
     while (true) {
         /* Задержка */
@@ -132,7 +135,7 @@ void hal_error_callback(void)
         }
 
         /* Переключить светодиод состояния */
-        led_toggle(&led_st);
+        led_toggle(&led[LED_ST]);
     }
 }
 /* ------------------------------------------------------------------------- */
@@ -154,8 +157,13 @@ static void app_main(void *arg)
     w25q_init(&w25q);
     /* Инициализировать хранилище FatFs */
     storage_ff_init();
+    /* Инициализировать Modbus */
+    modbus_init(&modbus[MODBUS0]);
+    modbus_init(&modbus[MODBUS1]);
     /* Загрузка EEPROM после инициализации всех компонентов */
     eeprom_load(&eeprom);
+    /* Включить светодиод состояния */
+    led_on(&led[LED_ST]);
     /* INIT CODE END ------------------------------------------------------- */
 
     TickType_t last_wake_time = xTaskGetTickCount();
@@ -163,12 +171,6 @@ static void app_main(void *arg)
     while (true) {
         vTaskDelayUntil(&last_wake_time, frequency);
 
-        /* Включить светодиод состояния */
-        led_on(&led_st);
-
-        /* Обновить информацию об используемой памяти FreeRTOS */
-        free_heap_size = xPortGetFreeHeapSize();
-        minimum_ever_free_heap_size = xPortGetMinimumEverFreeHeapSize();
     }
 }
 /* ------------------------------------------------------------------------- */
@@ -177,6 +179,9 @@ void vApplicationIdleHook(void)
 {
     /* Отслеживание свободного времени FreeRTOS */
     appl_idle_hook_counter++;
+    /* Обновить информацию об используемой памяти FreeRTOS */
+    free_heap_size = xPortGetFreeHeapSize();
+    minimum_ever_free_heap_size = xPortGetMinimumEverFreeHeapSize();
 }
 /* ------------------------------------------------------------------------- */
 
@@ -193,10 +198,12 @@ static void setup_hardware(void)
     gpio_init();
     rtc_init();
     adc_init();
+    crc_init();
     dma_init();
     spi_init();
     i2c_init();
-    crc_init();
+    usart_init();
+    tim_init();
 }
 /* ------------------------------------------------------------------------- */
 
