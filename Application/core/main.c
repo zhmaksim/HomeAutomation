@@ -16,17 +16,11 @@
  */
 
 /*
- * TODO DMA
- * TODO SPI
- * TODO DIO
- * TODO W25Q
- * TODO FatFs
- * TODO W5500
- * TODO Http Server
- * TODO I2C
- * TODO EEPROM
  * TODO USART
  * TODO Modbus RTU
+ * TODO W5500
+ * TODO FatFs
+ * TODO HTTP-server
  */
 
 /* Includes ---------------------------------------------------------------- */
@@ -39,9 +33,16 @@
 #include "gpio.h"
 #include "rtc.h"
 #include "adc.h"
+#include "dma.h"
+#include "spi.h"
+#include "i2c.h"
+#include "crc.h"
 #include "led.h"
 #include "watch.h"
 #include "sensors.h"
+#include "dio.h"
+#include "w25q.h"
+#include "eeprom.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -70,7 +71,7 @@ const struct sw_version sw_version = {
 
 /* Дата ПО */
 const struct sw_date sw_date = {
-    .day = 22,
+    .day = 23,
     .month = 10,
     .year = 24,
 };
@@ -143,6 +144,10 @@ static void app_main(void *arg)
     /* INIT CODE BEGIN ----------------------------------------------------- */
     watch_init(&watch);
     sensors_init(&sensors);
+    dio_init(&dio);
+    w25q_init(&w25q);
+    eeprom_init(&eeprom);
+    eeprom_load(&eeprom);
     /* INIT CODE END ------------------------------------------------------- */
 
     TickType_t last_wake_time = xTaskGetTickCount();
@@ -180,6 +185,10 @@ static void setup_hardware(void)
     gpio_init();
     rtc_init();
     adc_init();
+    dma_init();
+    spi_init();
+    i2c_init();
+    crc_init();
 }
 /* ------------------------------------------------------------------------- */
 

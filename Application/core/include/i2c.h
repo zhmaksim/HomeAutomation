@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STM32F446XX_IT_H_
-#define STM32F446XX_IT_H_
+#ifndef I2C_H_
+#define I2C_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,16 +25,19 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "stm32f4xx_hal_systick.h"
-#include "stm32f4xx_hal_pwr.h"
-#include "stm32f4xx_hal_adc.h"
-#include "stm32f4xx_hal_dma.h"
-#include "stm32f4xx_hal_spi.h"
 #include "stm32f4xx_hal_i2c.h"
 
 /* Exported macros --------------------------------------------------------- */
 
 /* Exported constants ------------------------------------------------------ */
+
+#define I2C_EV_CMD_CPLT_Pos         0
+#define I2C_EV_CMD_CPLT_Msk         HAL_BITMASK(0x01, I2C_EV_CMD_CPLT_Pos)
+#define I2C_EV_CMD_CPLT             I2C_EV_CMD_CPLT_Msk
+
+#define I2C_EV_ERR_Pos              7
+#define I2C_EV_ERR_Msk              HAL_BITMASK(0x01, I2C_EV_ERR_Pos)
+#define I2C_EV_ERR                  I2C_EV_ERR_Msk
 
 /* Exported types ---------------------------------------------------------- */
 
@@ -42,57 +45,7 @@ extern "C" {
 
 /* Exported function prototypes -------------------------------------------- */
 
-void NMI_Handler(void);
-
-void HardFault_Handler(void);
-
-void MemManage_Handler(void);
-
-void BusFault_Handler(void);
-
-void UsageFault_Handler(void);
-
-void SysTick_Handler(void);
-
-void SysTick_PeriodElapsedCallback(void);
-
-void PVD_IRQHandler(void);
-
-void PWR_PVD_StatusChangedCallback(void);
-
-void ADC_IRQHandler(void);
-
-void ADC_MeasureCompletedCallback(struct adc_handle *handle);
-
-void ADC_ErrorCallback(struct adc_handle *handle);
-
-void DMA1_Stream0_IRQHandler(void);
-
-void DMA1_Stream3_IRQHandler(void);
-
-void DMA1_Stream4_IRQHandler(void);
-
-void DMA1_Stream7_IRQHandler(void);
-
-void DMA2_Stream2_IRQHandler(void);
-
-void DMA2_Stream3_IRQHandler(void);
-
-void DMA_TransferCompletedCallback(struct dma_handle *handle);
-
-void DMA_TransferErrorCallback(struct dma_handle *handle);
-
-void SPI_TransmitReceiveCompletedCallback(struct spi_handle *handle);
-
-void SPI_ErrorCallback(struct spi_handle *handle);
-
-void I2C1_EV_IRQHandler(void);
-
-void I2C1_ER_IRQHandler(void);
-
-void I2C_CommandCompletedCallback(struct i2c_handle *handle);
-
-void I2C_ErrorCallback(struct i2c_handle *handle);
+void i2c_init(void);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -100,4 +53,4 @@ void I2C_ErrorCallback(struct i2c_handle *handle);
 }
 #endif /* __cplusplus */
 
-#endif /* STM32F446XX_IT_H_ */
+#endif /* I2C_H_ */

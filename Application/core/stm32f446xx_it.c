@@ -21,7 +21,13 @@
 #include "systick.h"
 #include "pwr.h"
 #include "adc.h"
+#include "dma.h"
+#include "spi.h"
+#include "i2c.h"
 #include "sensors.h"
+#include "dio.h"
+#include "w25q.h"
+#include "eeprom.h"
 
 /* Private macros ---------------------------------------------------------- */
 
@@ -42,6 +48,22 @@ extern bool vdd_is_lower;
 
 /* Обработчик ADC1 */
 extern struct adc_handle adc1;
+
+/* Обработчики DMA */
+extern struct dma_handle dma1_stream0;
+extern struct dma_handle dma1_stream3;
+extern struct dma_handle dma1_stream4;
+extern struct dma_handle dma1_stream7;
+extern struct dma_handle dma2_stream2;
+extern struct dma_handle dma2_stream3;
+
+/* Обработчики SPI */
+extern struct spi_handle spi1;
+extern struct spi_handle spi2;
+extern struct spi_handle spi3;
+
+/* Обработчик I2C1 */
+extern struct i2c_handle i2c1;
 
 /* Private function prototypes --------------------------------------------- */
 
@@ -124,5 +146,107 @@ void ADC_ErrorCallback(struct adc_handle *handle)
 {
     if (handle == &adc1)
         sensors_adc_error_it_handler(&sensors);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA1_Stream0_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma1_stream0);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA1_Stream3_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma1_stream3);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA1_Stream4_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma1_stream4);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA1_Stream7_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma1_stream7);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA2_Stream2_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma2_stream2);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA2_Stream3_IRQHandler(void)
+{
+    hal_dma_it_handler(&dma2_stream3);
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA_TransferCompletedCallback(struct dma_handle *handle)
+{
+    if (handle == &dma2_stream2) {
+        hal_spi_transmit_receive_completed_dma_it_handler(&spi1);
+    } else if (handle == &dma1_stream3) {
+        hal_spi_transmit_receive_completed_dma_it_handler(&spi2);
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void DMA_TransferErrorCallback(struct dma_handle *handle)
+{
+    if (handle == &dma2_stream2 || handle == &dma2_stream3) {
+        hal_spi_error_dma_it_handler(&spi1);
+    } else if (handle == &dma1_stream3 || handle == &dma1_stream4) {
+        hal_spi_error_dma_it_handler(&spi2);
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void SPI_TransmitReceiveCompletedCallback(struct spi_handle *handle)
+{
+    if (handle == &spi1) {
+        w25q_spi_transmit_receive_completed_it_handler(&w25q);
+    } else if (handle == &spi2) {
+        dio_spi_transmit_receive_completed_it_handler(&dio);
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void SPI_ErrorCallback(struct spi_handle *handle)
+{
+    if (handle == &spi1) {
+        w25q_spi_error_it_handler(&w25q);
+    } else if (handle == &spi2) {
+        dio_spi_error_it_handler(&dio);
+    }
+}
+/* ------------------------------------------------------------------------- */
+
+void I2C1_EV_IRQHandler(void)
+{
+    hal_i2c_it_handler(&i2c1);
+}
+/* ------------------------------------------------------------------------- */
+
+void I2C1_ER_IRQHandler(void)
+{
+    hal_i2c_it_handler(&i2c1);
+}
+/* ------------------------------------------------------------------------- */
+
+void I2C_CommandCompletedCallback(struct i2c_handle *handle)
+{
+    if (handle == &i2c1)
+        eeprom_i2c_command_completed_it_handler(&eeprom);
+}
+/* ------------------------------------------------------------------------- */
+
+void I2C_ErrorCallback(struct i2c_handle *handle)
+{
+    if (handle == &i2c1)
+        eeprom_i2c_error_it_handler(&eeprom);
 }
 /* ------------------------------------------------------------------------- */

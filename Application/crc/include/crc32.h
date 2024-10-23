@@ -15,8 +15,8 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STM32F446XX_IT_H_
-#define STM32F446XX_IT_H_
+#ifndef CRC32_H_
+#define CRC32_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,12 +25,6 @@ extern "C" {
 /* Includes ---------------------------------------------------------------- */
 
 #include "main.h"
-#include "stm32f4xx_hal_systick.h"
-#include "stm32f4xx_hal_pwr.h"
-#include "stm32f4xx_hal_adc.h"
-#include "stm32f4xx_hal_dma.h"
-#include "stm32f4xx_hal_spi.h"
-#include "stm32f4xx_hal_i2c.h"
 
 /* Exported macros --------------------------------------------------------- */
 
@@ -42,57 +36,7 @@ extern "C" {
 
 /* Exported function prototypes -------------------------------------------- */
 
-void NMI_Handler(void);
-
-void HardFault_Handler(void);
-
-void MemManage_Handler(void);
-
-void BusFault_Handler(void);
-
-void UsageFault_Handler(void);
-
-void SysTick_Handler(void);
-
-void SysTick_PeriodElapsedCallback(void);
-
-void PVD_IRQHandler(void);
-
-void PWR_PVD_StatusChangedCallback(void);
-
-void ADC_IRQHandler(void);
-
-void ADC_MeasureCompletedCallback(struct adc_handle *handle);
-
-void ADC_ErrorCallback(struct adc_handle *handle);
-
-void DMA1_Stream0_IRQHandler(void);
-
-void DMA1_Stream3_IRQHandler(void);
-
-void DMA1_Stream4_IRQHandler(void);
-
-void DMA1_Stream7_IRQHandler(void);
-
-void DMA2_Stream2_IRQHandler(void);
-
-void DMA2_Stream3_IRQHandler(void);
-
-void DMA_TransferCompletedCallback(struct dma_handle *handle);
-
-void DMA_TransferErrorCallback(struct dma_handle *handle);
-
-void SPI_TransmitReceiveCompletedCallback(struct spi_handle *handle);
-
-void SPI_ErrorCallback(struct spi_handle *handle);
-
-void I2C1_EV_IRQHandler(void);
-
-void I2C1_ER_IRQHandler(void);
-
-void I2C_CommandCompletedCallback(struct i2c_handle *handle);
-
-void I2C_ErrorCallback(struct i2c_handle *handle);
+uint32_t crc32(const void *data, size_t size);
 
 /* Exported callback function prototypes ----------------------------------- */
 
@@ -100,4 +44,4 @@ void I2C_ErrorCallback(struct i2c_handle *handle);
 }
 #endif /* __cplusplus */
 
-#endif /* STM32F446XX_IT_H_ */
+#endif /* CRC32_H_ */
